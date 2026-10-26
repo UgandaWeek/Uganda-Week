@@ -106,7 +106,7 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                            <i data-lucide="calendar" class="w-4 h-4 text-uganda-yellow"></i> Select Days (Check all that apply)
+                            <i data-lucide="calendar" class="w-4 h-4 text-uganda-yellow"></i> Select Days (Tuesday, Wednesday, Thursday)
                         </label>
                         <div class="grid grid-cols-3 gap-2 bg-black/70 border border-gray-700 rounded-xl p-3">
                             <label class="flex items-center gap-2 text-xs text-white cursor-pointer select-none">
@@ -157,7 +157,7 @@
                         </div>
                         <div class="grid grid-cols-2 gap-3 mb-4">
                             <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Days Selected</span><span id="resDays" class="text-xs font-bold text-uganda-yellow">--</span></div>
-                            <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Time</span><span id="resTimeSlot" class="text-sm font-bold text-uganda-yellow">--</span></div>
+                            <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Time Slot</span><span id="resTimeSlot" class="text-sm font-bold text-uganda-yellow">--</span></div>
                         </div>
                         <div class="bg-gradient-to-r from-gray-900 via-black to-gray-900 p-4 rounded-xl border border-uganda-yellow/50 text-center">
                             <span class="text-[10px] text-gray-400 tracking-widest block mb-1 uppercase">Code Number</span>
@@ -235,7 +235,7 @@
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('classNo')">Number ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('days')">Days Selected ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('code')">Code Number ↕</th>
-                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Time ↕</th>
+                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Time Slot ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timestamp')">Register Date ↕</th>
                                     <th class="p-3.5">Action</th>
                                 </tr>
@@ -250,7 +250,7 @@
                     <div class="max-h-[28vh] overflow-auto border border-red-900/40 rounded-2xl bg-black">
                         <table class="w-full text-left text-xs text-gray-300">
                             <thead class="bg-black text-gray-400 uppercase sticky top-0 border-b border-red-900/40 font-mono">
-                                <tr><th class="p-3.5">Grade</th><th class="p-3.5">Class</th><th class="p-3.5">Number</th><th class="p-3.5">Days Selected</th><th class="p-3.5">Code Number</th><th class="p-3.5">Time</th><th class="p-3.5">Register Date</th><th class="p-3.5">Action</th></tr>
+                                <tr><th class="p-3.5">Grade</th><th class="p-3.5">Class</th><th class="p-3.5">Number</th><th class="p-3.5">Days Selected</th><th class="p-3.5">Code Number</th><th class="p-3.5">Time Slot</th><th class="p-3.5">Register Date</th><th class="p-3.5">Action</th></tr>
                             </thead>
                             <tbody id="spamTableBody" class="divide-y divide-red-950 font-mono"></tbody>
                         </table>
@@ -495,7 +495,7 @@
         function exportToCSV() {
             let entries = getEntries();
             if(!entries.length) return alert('No entries.');
-            let csv = "Grade,Class,Number,Days Selected,Code Number,Time,Register Date\n" + 
+            let csv = "Grade,Class,Number,Days Selected,Code Number,Time Slot,Register Date\n" + 
                 entries.map(r => `"${r.grade}","${r.class}",${r.classNo},"${r.days || ''}","${r.code}","${r.timeSlot || ''}","${r.timestamp}"`).join("\n");
             let link = document.createElement("a");
             link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
@@ -511,6 +511,7 @@
                 renderTable();
                 hideClearLogVerification();
             } else {
+                document.getElementById('clearPassError2').classList.add('hidden'); // Fixed toggle bug
                 document.getElementById('clearPassError2').classList.remove('hidden');
             }
         }
