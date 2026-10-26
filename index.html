@@ -65,12 +65,12 @@
                         <i data-lucide="user-check" class="text-uganda-yellow w-5 h-5"></i> Student Registration
                     </h2>
                 </div>
-                <form id="registrationForm" class="space-y-5" onsubmit="handleFormSubmit(event)">
+                <form id="registrationForm" class="space-y-4" onsubmit="handleFormSubmit(event)">
                     <div>
-                        <label for="gradeSelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <label for="gradeSelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                             <i data-lucide="graduation-cap" class="w-4 h-4 text-uganda-yellow"></i> Select Grade
                         </label>
-                        <select id="gradeSelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3.5 transition-all outline-none appearance-none cursor-pointer">
+                        <select id="gradeSelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3 transition-all outline-none appearance-none cursor-pointer">
                             <option value="" disabled selected>-- Choose Grade --</option>
                             <optgroup label="Kindergarten">
                                 <option value="K1">K1</option><option value="K2">K2</option><option value="K3">K3</option>
@@ -85,10 +85,10 @@
                     </div>
 
                     <div>
-                        <label for="classSelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <label for="classSelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                             <i data-lucide="school" class="w-4 h-4 text-uganda-red"></i> Select Class
                         </label>
-                        <select id="classSelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3.5 transition-all outline-none cursor-pointer">
+                        <select id="classSelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3 transition-all outline-none cursor-pointer">
                             <option value="" disabled selected>-- Choose Class --</option>
                             <option value="A">Class A</option><option value="B">Class B</option><option value="C">Class C</option>
                             <option value="D">Class D</option><option value="E">Class E</option><option value="F">Class F</option>
@@ -96,26 +96,42 @@
                     </div>
 
                     <div>
-                        <label for="classNoSelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <label for="classNoSelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                             <i data-lucide="hash" class="w-4 h-4 text-uganda-yellow"></i> Class No. (1-45)
                         </label>
-                        <select id="classNoSelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3.5 transition-all outline-none cursor-pointer">
+                        <select id="classNoSelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3 transition-all outline-none cursor-pointer">
                             <option value="" disabled selected>-- Select Number --</option>
                         </select>
                     </div>
 
                     <div>
-                        <label for="timeSelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                            <i data-lucide="clock" class="w-4 h-4 text-uganda-red"></i> Select Intended Date / Time Slot
+                        <label for="daySelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            <i data-lucide="calendar" class="w-4 h-4 text-uganda-yellow"></i> Select Day
                         </label>
-                        <select id="timeSelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3.5 transition-all outline-none cursor-pointer"></select>
+                        <select id="daySelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3 transition-all outline-none cursor-pointer">
+                            <option value="" disabled selected>-- Choose Day --</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="timeSelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            <i data-lucide="clock" class="w-4 h-4 text-uganda-red"></i> Select Time Slot
+                        </label>
+                        <select id="timeSelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3 transition-all outline-none cursor-pointer">
+                            <option value="" disabled selected>-- Choose Time --</option>
+                            <option value="13:00">13:00</option>
+                            <option value="13:30">13:30</option>
+                        </select>
                     </div>
 
                     <div id="duplicateWarning" class="hidden p-3 rounded-xl bg-red-900/30 border border-red-600/50 text-red-300 text-xs">
                         ⚠️ This student has already been registered across devices. Duplicate entry is not allowed.
                     </div>
 
-                    <button type="submit" class="w-full mt-4 bg-gradient-to-r from-uganda-yellow via-yellow-500 to-uganda-red text-black font-extrabold text-base py-4 px-6 rounded-xl shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full mt-3 bg-gradient-to-r from-uganda-yellow via-yellow-500 to-uganda-red text-black font-extrabold text-base py-3.5 px-6 rounded-xl shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                         <span>CONFIRM & GENERATE CODE</span> <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     </button>
                 </form>
@@ -133,7 +149,10 @@
                             <div class="bg-gray-900/80 p-2.5 rounded-xl border border-gray-800"><span class="text-[10px] text-gray-400 block">CLASS</span><span id="resClass" class="text-base font-bold text-white">--</span></div>
                             <div class="bg-gray-900/80 p-2.5 rounded-xl border border-gray-800"><span class="text-[10px] text-gray-400 block">NO.</span><span id="resClassNo" class="text-base font-bold text-white">--</span></div>
                         </div>
-                        <div class="bg-gray-900/60 p-3 rounded-xl border border-gray-800 mb-4 text-center"><span class="text-[10px] text-gray-400 block uppercase">Intended Date</span><span id="resTimeSlot" class="text-lg font-bold text-uganda-yellow">--:--</span></div>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Day</span><span id="resDay" class="text-sm font-bold text-uganda-yellow">--</span></div>
+                            <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Time</span><span id="resTimeSlot" class="text-sm font-bold text-uganda-yellow">--</span></div>
+                        </div>
                         <div class="bg-gradient-to-r from-gray-900 via-black to-gray-900 p-4 rounded-xl border border-uganda-yellow/50 text-center">
                             <span class="text-[10px] text-gray-400 tracking-widest block mb-1 uppercase">Code Number</span>
                             <div id="resCode" class="text-4xl sm:text-5xl font-mono font-black text-uganda-yellow tracking-widest py-1">0001</div>
@@ -148,7 +167,7 @@
     </main>
 
     <div id="adminModal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden transition-opacity duration-300">
-        <div class="bg-black border border-gray-800 w-full max-w-4xl max-h-[90vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden">
+        <div class="bg-black border border-gray-800 w-full max-w-5xl max-h-[90vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden">
             <div class="p-5 border-b border-gray-800 flex items-center justify-between bg-black flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="p-2 rounded-xl bg-uganda-yellow/10 border border-uganda-yellow/30 text-uganda-yellow"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i></div>
@@ -208,8 +227,9 @@
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('grade')">Grade ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('class')">Class ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('classNo')">Number ↕</th>
+                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('day')">Day ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('code')">Code Number ↕</th>
-                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Intended Date ↕</th>
+                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Time ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timestamp')">Register Date ↕</th>
                                     <th class="p-3.5">Action</th>
                                 </tr>
@@ -224,7 +244,7 @@
                     <div class="max-h-[28vh] overflow-auto border border-red-900/40 rounded-2xl bg-black">
                         <table class="w-full text-left text-xs text-gray-300">
                             <thead class="bg-black text-gray-400 uppercase sticky top-0 border-b border-red-900/40 font-mono">
-                                <tr><th class="p-3.5">Grade</th><th class="p-3.5">Class</th><th class="p-3.5">Number</th><th class="p-3.5">Code Number</th><th class="p-3.5">Intended Date</th><th class="p-3.5">Register Date</th><th class="p-3.5">Action</th></tr>
+                                <tr><th class="p-3.5">Grade</th><th class="p-3.5">Class</th><th class="p-3.5">Number</th><th class="p-3.5">Day</th><th class="p-3.5">Code Number</th><th class="p-3.5">Time</th><th class="p-3.5">Register Date</th><th class="p-3.5">Action</th></tr>
                             </thead>
                             <tbody id="spamTableBody" class="divide-y divide-red-950 font-mono"></tbody>
                         </table>
@@ -257,7 +277,6 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
-            populateTimes();
             populateClassNos();
             setupTrigger();
             fetchRemoteEntries();
@@ -266,16 +285,6 @@
                 document.getElementById(id).addEventListener('change', () => document.getElementById('duplicateWarning').classList.add('hidden'));
             });
         });
-
-        function populateTimes() {
-            let sel = document.getElementById('timeSelect');
-            for(let m = 780; m <= 830; m += 10) {
-                let time = `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
-                let opt = document.createElement('option');
-                opt.value = opt.textContent = time;
-                sel.appendChild(opt);
-            }
-        }
 
         function populateClassNos() {
             let sel = document.getElementById('classNoSelect');
@@ -312,6 +321,7 @@
             let g = document.getElementById('gradeSelect').value;
             let c = document.getElementById('classSelect').value;
             let n = parseInt(document.getElementById('classNoSelect').value);
+            let d = document.getElementById('daySelect').value;
             let t = document.getElementById('timeSelect').value;
 
             let entries = getEntries();
@@ -327,6 +337,7 @@
                 grade: g, 
                 class: c, 
                 classNo: n, 
+                day: d,
                 code: code, 
                 timeSlot: t, 
                 timestamp: new Date().toLocaleString(), 
@@ -372,6 +383,7 @@
             document.getElementById('resGrade').textContent = e.grade;
             document.getElementById('resClass').textContent = e.class;
             document.getElementById('resClassNo').textContent = e.classNo;
+            document.getElementById('resDay').textContent = e.day || '--';
             document.getElementById('resTimeSlot').textContent = e.timeSlot;
             document.getElementById('resCode').textContent = e.code;
             document.getElementById('formCard').classList.add('hidden');
@@ -448,10 +460,10 @@
             vTbody.innerHTML = ''; sTbody.innerHTML = '';
             let valid = 0, spam = 0;
 
-            entries.filter(i => `${i.grade} ${i.class} ${i.code} ${i.timeSlot}`.toLowerCase().includes(q)).forEach((e) => {
+            entries.filter(i => `${i.grade} ${i.class} ${i.day || ''} ${i.code} ${i.timeSlot}`.toLowerCase().includes(q)).forEach((e) => {
                 let tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-900 transition';
-                tr.innerHTML = `<td class="p-3.5 font-bold text-uganda-yellow">${e.grade}</td><td class="p-3.5 text-white">${e.class}</td><td class="p-3.5 text-white">${e.classNo}</td><td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code}</td><td class="p-3.5 text-uganda-yellow">${e.timeSlot}</td><td class="p-3.5 text-gray-400 text-[11px]">${e.timestamp}</td><td class="p-3.5"><button onclick="deleteEntry(${e.id})" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>`;
+                tr.innerHTML = `<td class="p-3.5 font-bold text-uganda-yellow">${e.grade}</td><td class="p-3.5 text-white">${e.class}</td><td class="p-3.5 text-white">${e.classNo}</td><td class="p-3.5 text-cyan-300 font-semibold">${e.day || '-'}</td><td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code}</td><td class="p-3.5 text-uganda-yellow">${e.timeSlot}</td><td class="p-3.5 text-gray-400 text-[11px]">${e.timestamp}</td><td class="p-3.5"><button onclick="deleteEntry(${e.id})" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>`;
                 if(e.isPermanentSpam) { sTbody.appendChild(tr); spam++; } else { vTbody.appendChild(tr); valid++; }
             });
 
@@ -468,8 +480,8 @@
         function exportToCSV() {
             let entries = getEntries();
             if(!entries.length) return alert('No entries.');
-            let csv = "Grade,Class,Number,Code Number,Intended Date,Register Date\n" + 
-                entries.map(r => `"${r.grade}","${r.class}",${r.classNo},"${r.code}","${r.timeSlot || ''}","${r.timestamp}"`).join("\n");
+            let csv = "Grade,Class,Number,Day,Code Number,Time,Register Date\n" + 
+                entries.map(r => `"${r.grade}","${r.class}",${r.classNo},"${r.day || ''}","${r.code}","${r.timeSlot || ''}","${r.timestamp}"`).join("\n");
             let link = document.createElement("a");
             link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
             link.download = `Uganda_Week_Registrations_${Date.now()}.csv`;
