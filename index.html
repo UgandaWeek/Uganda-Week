@@ -105,15 +105,21 @@
                     </div>
 
                     <div>
-                        <label for="daySelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                            <i data-lucide="calendar" class="w-4 h-4 text-uganda-yellow"></i> Select Day
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <i data-lucide="calendar" class="w-4 h-4 text-uganda-yellow"></i> Select Days (Check all that apply)
                         </label>
-                        <select id="daySelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3 transition-all outline-none cursor-pointer">
-                            <option value="" disabled selected>-- Choose Day --</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                        </select>
+                        <div class="grid grid-cols-3 gap-2 bg-black/70 border border-gray-700 rounded-xl p-3">
+                            <label class="flex items-center gap-2 text-xs text-white cursor-pointer select-none">
+                                <input type="checkbox" name="daysCheckbox" value="Tuesday" class="accent-yellow-500 w-4 h-4 rounded"> Tuesday
+                            </label>
+                            <label class="flex items-center gap-2 text-xs text-white cursor-pointer select-none">
+                                <input type="checkbox" name="daysCheckbox" value="Wednesday" class="accent-yellow-500 w-4 h-4 rounded"> Wednesday
+                            </label>
+                            <label class="flex items-center gap-2 text-xs text-white cursor-pointer select-none">
+                                <input type="checkbox" name="daysCheckbox" value="Thursday" class="accent-yellow-500 w-4 h-4 rounded"> Thursday
+                            </label>
+                        </div>
+                        <p id="dayError" class="text-xs text-red-400 mt-1 hidden">Please select at least one day.</p>
                     </div>
 
                     <div>
@@ -150,7 +156,7 @@
                             <div class="bg-gray-900/80 p-2.5 rounded-xl border border-gray-800"><span class="text-[10px] text-gray-400 block">NO.</span><span id="resClassNo" class="text-base font-bold text-white">--</span></div>
                         </div>
                         <div class="grid grid-cols-2 gap-3 mb-4">
-                            <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Day</span><span id="resDay" class="text-sm font-bold text-uganda-yellow">--</span></div>
+                            <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Days Selected</span><span id="resDays" class="text-xs font-bold text-uganda-yellow">--</span></div>
                             <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Time</span><span id="resTimeSlot" class="text-sm font-bold text-uganda-yellow">--</span></div>
                         </div>
                         <div class="bg-gradient-to-r from-gray-900 via-black to-gray-900 p-4 rounded-xl border border-uganda-yellow/50 text-center">
@@ -227,7 +233,7 @@
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('grade')">Grade ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('class')">Class ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('classNo')">Number ↕</th>
-                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('day')">Day ↕</th>
+                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('days')">Days Selected ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('code')">Code Number ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Time ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timestamp')">Register Date ↕</th>
@@ -244,7 +250,7 @@
                     <div class="max-h-[28vh] overflow-auto border border-red-900/40 rounded-2xl bg-black">
                         <table class="w-full text-left text-xs text-gray-300">
                             <thead class="bg-black text-gray-400 uppercase sticky top-0 border-b border-red-900/40 font-mono">
-                                <tr><th class="p-3.5">Grade</th><th class="p-3.5">Class</th><th class="p-3.5">Number</th><th class="p-3.5">Day</th><th class="p-3.5">Code Number</th><th class="p-3.5">Time</th><th class="p-3.5">Register Date</th><th class="p-3.5">Action</th></tr>
+                                <tr><th class="p-3.5">Grade</th><th class="p-3.5">Class</th><th class="p-3.5">Number</th><th class="p-3.5">Days Selected</th><th class="p-3.5">Code Number</th><th class="p-3.5">Time</th><th class="p-3.5">Register Date</th><th class="p-3.5">Action</th></tr>
                             </thead>
                             <tbody id="spamTableBody" class="divide-y divide-red-950 font-mono"></tbody>
                         </table>
@@ -321,8 +327,15 @@
             let g = document.getElementById('gradeSelect').value;
             let c = document.getElementById('classSelect').value;
             let n = parseInt(document.getElementById('classNoSelect').value);
-            let d = document.getElementById('daySelect').value;
             let t = document.getElementById('timeSelect').value;
+
+            let checkedDays = Array.from(document.querySelectorAll('input[name="daysCheckbox"]:checked')).map(cb => cb.value);
+            if (checkedDays.length === 0) {
+                document.getElementById('dayError').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('dayError').classList.add('hidden');
+            let daysStr = checkedDays.join(", ");
 
             let entries = getEntries();
             if(entries.some(item => item.grade === g && item.class === c && item.classNo === n)) {
@@ -337,7 +350,7 @@
                 grade: g, 
                 class: c, 
                 classNo: n, 
-                day: d,
+                days: daysStr,
                 code: code, 
                 timeSlot: t, 
                 timestamp: new Date().toLocaleString(), 
@@ -383,7 +396,7 @@
             document.getElementById('resGrade').textContent = e.grade;
             document.getElementById('resClass').textContent = e.class;
             document.getElementById('resClassNo').textContent = e.classNo;
-            document.getElementById('resDay').textContent = e.day || '--';
+            document.getElementById('resDays').textContent = e.days || '--';
             document.getElementById('resTimeSlot').textContent = e.timeSlot;
             document.getElementById('resCode').textContent = e.code;
             document.getElementById('formCard').classList.add('hidden');
@@ -394,7 +407,9 @@
             document.getElementById('ticketCard').classList.add('hidden');
             document.getElementById('formCard').classList.remove('hidden');
             document.getElementById('registrationForm').reset();
+            document.querySelectorAll('input[name="daysCheckbox"]').forEach(cb => cb.checked = false);
             document.getElementById('duplicateWarning').classList.add('hidden');
+            document.getElementById('dayError').classList.add('hidden');
         }
 
         function setupTrigger() {
@@ -460,10 +475,10 @@
             vTbody.innerHTML = ''; sTbody.innerHTML = '';
             let valid = 0, spam = 0;
 
-            entries.filter(i => `${i.grade} ${i.class} ${i.day || ''} ${i.code} ${i.timeSlot}`.toLowerCase().includes(q)).forEach((e) => {
+            entries.filter(i => `${i.grade} ${i.class} ${i.days || ''} ${i.code} ${i.timeSlot}`.toLowerCase().includes(q)).forEach((e) => {
                 let tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-900 transition';
-                tr.innerHTML = `<td class="p-3.5 font-bold text-uganda-yellow">${e.grade}</td><td class="p-3.5 text-white">${e.class}</td><td class="p-3.5 text-white">${e.classNo}</td><td class="p-3.5 text-cyan-300 font-semibold">${e.day || '-'}</td><td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code}</td><td class="p-3.5 text-uganda-yellow">${e.timeSlot}</td><td class="p-3.5 text-gray-400 text-[11px]">${e.timestamp}</td><td class="p-3.5"><button onclick="deleteEntry(${e.id})" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>`;
+                tr.innerHTML = `<td class="p-3.5 font-bold text-uganda-yellow">${e.grade}</td><td class="p-3.5 text-white">${e.class}</td><td class="p-3.5 text-white">${e.classNo}</td><td class="p-3.5 text-cyan-300 font-semibold">${e.days || '-'}</td><td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code}</td><td class="p-3.5 text-uganda-yellow">${e.timeSlot}</td><td class="p-3.5 text-gray-400 text-[11px]">${e.timestamp}</td><td class="p-3.5"><button onclick="deleteEntry(${e.id})" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>`;
                 if(e.isPermanentSpam) { sTbody.appendChild(tr); spam++; } else { vTbody.appendChild(tr); valid++; }
             });
 
@@ -480,8 +495,8 @@
         function exportToCSV() {
             let entries = getEntries();
             if(!entries.length) return alert('No entries.');
-            let csv = "Grade,Class,Number,Day,Code Number,Time,Register Date\n" + 
-                entries.map(r => `"${r.grade}","${r.class}",${r.classNo},"${r.day || ''}","${r.code}","${r.timeSlot || ''}","${r.timestamp}"`).join("\n");
+            let csv = "Grade,Class,Number,Days Selected,Code Number,Time,Register Date\n" + 
+                entries.map(r => `"${r.grade}","${r.class}",${r.classNo},"${r.days || ''}","${r.code}","${r.timeSlot || ''}","${r.timestamp}"`).join("\n");
             let link = document.createElement("a");
             link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
             link.download = `Uganda_Week_Registrations_${Date.now()}.csv`;
