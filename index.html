@@ -157,7 +157,7 @@
                         </div>
                         <div class="grid grid-cols-2 gap-3 mb-4">
                             <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Days Selected</span><span id="resDays" class="text-xs font-bold text-uganda-yellow">--</span></div>
-                            <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Time Slot</span><span id="resTimeSlot" class="text-sm font-bold text-uganda-yellow">--</span></div>
+                            <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800 text-center"><span class="text-[10px] text-gray-400 block uppercase">Intended Date</span><span id="resTimeSlot" class="text-sm font-bold text-uganda-yellow">--</span></div>
                         </div>
                         <div class="bg-gradient-to-r from-gray-900 via-black to-gray-900 p-4 rounded-xl border border-uganda-yellow/50 text-center">
                             <span class="text-[10px] text-gray-400 tracking-widest block mb-1 uppercase">Code Number</span>
@@ -233,9 +233,10 @@
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('grade')">Grade ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('class')">Class ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('classNo')">Number ↕</th>
-                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('days')">Days Selected ↕</th>
+                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('days')">Day ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('code')">Code Number ↕</th>
-                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Time Slot ↕</th>
+                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Intended Date ↕</th>
+                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timestamp')">Registered Date ↕</th>
                                     <th class="p-3.5">Action</th>
                                 </tr>
                             </thead>
@@ -253,9 +254,10 @@
                                     <th class="p-3.5">Grade</th>
                                     <th class="p-3.5">Class</th>
                                     <th class="p-3.5">Number</th>
-                                    <th class="p-3.5">Days Selected</th>
+                                    <th class="p-3.5">Day</th>
                                     <th class="p-3.5">Code Number</th>
-                                    <th class="p-3.5">Time Slot</th>
+                                    <th class="p-3.5">Intended Date</th>
+                                    <th class="p-3.5">Registered Date</th>
                                     <th class="p-3.5">Action</th>
                                 </tr>
                             </thead>
@@ -360,6 +362,7 @@
                 days: daysStr,
                 code: code, 
                 timeSlot: t, 
+                timestamp: new Date().toLocaleString(),
                 deviceId: deviceId, 
                 isPermanentSpam: entries.filter(x => x.deviceId === deviceId).length >= 8 
             };
@@ -387,11 +390,6 @@
                 delete window[cb];
                 if(script.parentNode) script.parentNode.removeChild(script);
                 if(Array.isArray(res)) { 
-                    // Prevent fetched data from overwriting locally deleted items if IDs match
-                    let localEntries = getEntries();
-                    let localIds = new Set(localEntries.map(e => String(e.id)));
-                    
-                    // Merge remote entries while preserving local deletions
                     saveEntries(res); 
                     if(!document.getElementById('adminModal').classList.contains('hidden')) {
                         renderTable();
@@ -505,8 +503,9 @@
                 tr.className = 'hover:bg-gray-900 transition';
                 
                 let daysVal = e.days || e.day || e.selectedDays || '--';
-                let rowId = e.id || e.code; // Fallback ID if e.id is missing
+                let rowId = e.id || e.code;
 
+                // Columns matching Grade | Class | Number | Day | Code Number | Intended Date | Registered Date | Action
                 tr.innerHTML = `
                     <td class="p-3.5 font-bold text-uganda-yellow">${e.grade || '--'}</td>
                     <td class="p-3.5 text-white">${e.class || '--'}</td>
@@ -514,6 +513,7 @@
                     <td class="p-3.5 text-cyan-300 font-semibold">${daysVal}</td>
                     <td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code || '--'}</td>
                     <td class="p-3.5 text-uganda-yellow">${formatTimeSlot(e.timeSlot)}</td>
+                    <td class="p-3.5 text-gray-400 text-[11px]">${e.timestamp || '--'}</td>
                     <td class="p-3.5"><button onclick="deleteEntry('${rowId}')" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>
                 `;
                 
@@ -533,17 +533,25 @@
 
         function deleteEntry(id) {
             let entries = getEntries();
-            // Robust string-based filtering to ensure IDs match regardless of type (number vs string)
             let updated = entries.filter(i => String(i.id !== undefined ? i.id : i.code) !== String(id));
             saveEntries(updated);
             renderTable();
+
+            if(WEBHOOK) {
+                fetch(WEBHOOK, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                    body: JSON.stringify({ action: 'deleteRecord', id: id })
+                }).catch(()=>{});
+            }
         }
 
         function exportToCSV() {
             let entries = getEntries();
             if(!entries.length) return alert('No entries.');
-            let csv = "Grade,Class,Number,Days Selected,Code Number,Time Slot\n" + 
-                entries.map(r => `"${r.grade}","${r.class}",${r.classNo},"${r.days || r.day || r.selectedDays || ''}","${r.code}","${formatTimeSlot(r.timeSlot) || ''}"`).join("\n");
+            let csv = "Grade,Class,Number,Day,Code Number,Intended Date,Registered Date\n" + 
+                entries.map(r => `"${r.grade}","${r.class}",${r.classNo},"${r.days || r.day || r.selectedDays || ''}","${r.code}","${formatTimeSlot(r.timeSlot) || ''}","${r.timestamp || ''}"`).join("\n");
             let link = document.createElement("a");
             link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
             link.download = `Uganda_Week_Registrations_${Date.now()}.csv`;
