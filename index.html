@@ -236,7 +236,6 @@
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('days')">Days Selected ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('code')">Code Number ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Time Slot ↕</th>
-                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timestamp')">Register Date ↕</th>
                                     <th class="p-3.5">Action</th>
                                 </tr>
                             </thead>
@@ -257,7 +256,6 @@
                                     <th class="p-3.5">Days Selected</th>
                                     <th class="p-3.5">Code Number</th>
                                     <th class="p-3.5">Time Slot</th>
-                                    <th class="p-3.5">Register Date</th>
                                     <th class="p-3.5">Action</th>
                                 </tr>
                             </thead>
@@ -362,7 +360,6 @@
                 days: daysStr,
                 code: code, 
                 timeSlot: t, 
-                timestamp: new Date().toLocaleString(), 
                 deviceId: deviceId, 
                 isPermanentSpam: entries.filter(x => x.deviceId === deviceId).length >= 8 
             };
@@ -405,8 +402,8 @@
             document.getElementById('resGrade').textContent = e.grade;
             document.getElementById('resClass').textContent = e.class;
             document.getElementById('resClassNo').textContent = e.classNo;
-            document.getElementById('resDays').textContent = e.days || '--';
-            document.getElementById('resTimeSlot').textContent = e.timeSlot;
+            document.getElementById('resDays').textContent = e.days || e.day || e.selectedDays || '--';
+            document.getElementById('resTimeSlot').textContent = formatTimeSlot(e.timeSlot);
             document.getElementById('resCode').textContent = e.code;
             document.getElementById('formCard').classList.add('hidden');
             document.getElementById('ticketCard').classList.remove('hidden');
@@ -467,6 +464,20 @@
             renderTable();
         }
 
+        function formatTimeSlot(timeVal) {
+            if (!timeVal) return '--';
+            let strVal = String(timeVal);
+            if (strVal.includes('1899')) {
+                let d = new Date(strVal);
+                if (!isNaN(d)) {
+                    let hours = String(d.getUTCHours()).padStart(2, '0');
+                    let minutes = String(d.getUTCMinutes()).padStart(2, '0');
+                    return `${hours}:${minutes}`;
+                }
+            }
+            return strVal;
+        }
+
         function renderTable() {
             let vTbody = document.getElementById('validTableBody'), sTbody = document.getElementById('spamTableBody');
             let q = document.getElementById('searchInput').value.toLowerCase();
@@ -484,19 +495,20 @@
             vTbody.innerHTML = ''; sTbody.innerHTML = '';
             let valid = 0, spam = 0;
 
-            entries.filter(i => `${i.grade} ${i.class} ${i.days || ''} ${i.code} ${i.timeSlot}`.toLowerCase().includes(q)).forEach((e) => {
+            entries.filter(i => `${i.grade} ${i.class} ${i.days || i.day || ''} ${i.code} ${i.timeSlot}`.toLowerCase().includes(q)).forEach((e) => {
                 let tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-900 transition';
                 
-                // Perfectly aligned columns matching headers: Grade | Class | Number | Days Selected | Code Number | Time Slot | Register Date | Action
+                let daysVal = e.days || e.day || e.selectedDays || '--';
+
+                // Columns: Grade | Class | Number | Days Selected | Code Number | Time Slot | Action
                 tr.innerHTML = `
                     <td class="p-3.5 font-bold text-uganda-yellow">${e.grade || '--'}</td>
                     <td class="p-3.5 text-white">${e.class || '--'}</td>
                     <td class="p-3.5 text-white">${e.classNo || '--'}</td>
-                    <td class="p-3.5 text-cyan-300 font-semibold">${e.days || '--'}</td>
+                    <td class="p-3.5 text-cyan-300 font-semibold">${daysVal}</td>
                     <td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code || '--'}</td>
-                    <td class="p-3.5 text-uganda-yellow">${e.timeSlot || '--'}</td>
-                    <td class="p-3.5 text-gray-400 text-[11px]">${e.timestamp || '--'}</td>
+                    <td class="p-3.5 text-uganda-yellow">${formatTimeSlot(e.timeSlot)}</td>
                     <td class="p-3.5"><button onclick="deleteEntry(${e.id})" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>
                 `;
                 
@@ -522,8 +534,8 @@
         function exportToCSV() {
             let entries = getEntries();
             if(!entries.length) return alert('No entries.');
-            let csv = "Grade,Class,Number,Days Selected,Code Number,Time Slot,Register Date\n" + 
-                entries.map(r => `"${r.grade}","${r.class}",${r.classNo},"${r.days || ''}","${r.code}","${r.timeSlot || ''}","${r.timestamp}"`).join("\n");
+            let csv = "Grade,Class,Number,Days Selected,Code Number,Time Slot\n" + 
+                entries.map(r => `"${r.grade}","${r.class}",${r.classNo},"${r.days || r.day || r.selectedDays || ''}","${r.code}","${formatTimeSlot(r.timeSlot) || ''}"`).join("\n");
             let link = document.createElement("a");
             link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
             link.download = `Uganda_Week_Registrations_${Date.now()}.csv`;
