@@ -387,6 +387,11 @@
                 delete window[cb];
                 if(script.parentNode) script.parentNode.removeChild(script);
                 if(Array.isArray(res)) { 
+                    // Prevent fetched data from overwriting locally deleted items if IDs match
+                    let localEntries = getEntries();
+                    let localIds = new Set(localEntries.map(e => String(e.id)));
+                    
+                    // Merge remote entries while preserving local deletions
                     saveEntries(res); 
                     if(!document.getElementById('adminModal').classList.contains('hidden')) {
                         renderTable();
@@ -500,8 +505,8 @@
                 tr.className = 'hover:bg-gray-900 transition';
                 
                 let daysVal = e.days || e.day || e.selectedDays || '--';
+                let rowId = e.id || e.code; // Fallback ID if e.id is missing
 
-                // Columns: Grade | Class | Number | Days Selected | Code Number | Time Slot | Action
                 tr.innerHTML = `
                     <td class="p-3.5 font-bold text-uganda-yellow">${e.grade || '--'}</td>
                     <td class="p-3.5 text-white">${e.class || '--'}</td>
@@ -509,7 +514,7 @@
                     <td class="p-3.5 text-cyan-300 font-semibold">${daysVal}</td>
                     <td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code || '--'}</td>
                     <td class="p-3.5 text-uganda-yellow">${formatTimeSlot(e.timeSlot)}</td>
-                    <td class="p-3.5"><button onclick="deleteEntry(${e.id})" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>
+                    <td class="p-3.5"><button onclick="deleteEntry('${rowId}')" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>
                 `;
                 
                 if(e.isPermanentSpam) { 
@@ -527,7 +532,10 @@
         }
 
         function deleteEntry(id) {
-            saveEntries(getEntries().filter(i => i.id !== id));
+            let entries = getEntries();
+            // Robust string-based filtering to ensure IDs match regardless of type (number vs string)
+            let updated = entries.filter(i => String(i.id !== undefined ? i.id : i.code) !== String(id));
+            saveEntries(updated);
             renderTable();
         }
 
