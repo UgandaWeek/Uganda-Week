@@ -250,7 +250,16 @@
                     <div class="max-h-[28vh] overflow-auto border border-red-900/40 rounded-2xl bg-black">
                         <table class="w-full text-left text-xs text-gray-300">
                             <thead class="bg-black text-gray-400 uppercase sticky top-0 border-b border-red-900/40 font-mono">
-                                <tr><th class="p-3.5">Grade</th><th class="p-3.5">Class</th><th class="p-3.5">Number</th><th class="p-3.5">Days Selected</th><th class="p-3.5">Code Number</th><th class="p-3.5">Time Slot</th><th class="p-3.5">Register Date</th><th class="p-3.5">Action</th></tr>
+                                <tr>
+                                    <th class="p-3.5">Grade</th>
+                                    <th class="p-3.5">Class</th>
+                                    <th class="p-3.5">Number</th>
+                                    <th class="p-3.5">Days Selected</th>
+                                    <th class="p-3.5">Code Number</th>
+                                    <th class="p-3.5">Time Slot</th>
+                                    <th class="p-3.5">Register Date</th>
+                                    <th class="p-3.5">Action</th>
+                                </tr>
                             </thead>
                             <tbody id="spamTableBody" class="divide-y divide-red-950 font-mono"></tbody>
                         </table>
@@ -478,8 +487,26 @@
             entries.filter(i => `${i.grade} ${i.class} ${i.days || ''} ${i.code} ${i.timeSlot}`.toLowerCase().includes(q)).forEach((e) => {
                 let tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-900 transition';
-                tr.innerHTML = `<td class="p-3.5 font-bold text-uganda-yellow">${e.grade}</td><td class="p-3.5 text-white">${e.class}</td><td class="p-3.5 text-white">${e.classNo}</td><td class="p-3.5 text-cyan-300 font-semibold">${e.days || '-'}</td><td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code}</td><td class="p-3.5 text-uganda-yellow">${e.timeSlot}</td><td class="p-3.5 text-gray-400 text-[11px]">${e.timestamp}</td><td class="p-3.5"><button onclick="deleteEntry(${e.id})" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>`;
-                if(e.isPermanentSpam) { sTbody.appendChild(tr); spam++; } else { vTbody.appendChild(tr); valid++; }
+                
+                // Perfectly aligned columns matching headers: Grade | Class | Number | Days Selected | Code Number | Time Slot | Register Date | Action
+                tr.innerHTML = `
+                    <td class="p-3.5 font-bold text-uganda-yellow">${e.grade || '--'}</td>
+                    <td class="p-3.5 text-white">${e.class || '--'}</td>
+                    <td class="p-3.5 text-white">${e.classNo || '--'}</td>
+                    <td class="p-3.5 text-cyan-300 font-semibold">${e.days || '--'}</td>
+                    <td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code || '--'}</td>
+                    <td class="p-3.5 text-uganda-yellow">${e.timeSlot || '--'}</td>
+                    <td class="p-3.5 text-gray-400 text-[11px]">${e.timestamp || '--'}</td>
+                    <td class="p-3.5"><button onclick="deleteEntry(${e.id})" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>
+                `;
+                
+                if(e.isPermanentSpam) { 
+                    sTbody.appendChild(tr); 
+                    spam++; 
+                } else { 
+                    vTbody.appendChild(tr); 
+                    valid++; 
+                }
             });
 
             document.getElementById('totalCount').textContent = entries.length;
