@@ -233,7 +233,9 @@
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('grade')">Grade ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('class')">Class ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('classNo')">Number ↕</th>
-                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('days')">Day ↕</th>
+                                    <th class="p-3.5 text-center cursor-pointer hover:text-uganda-yellow" onclick="sortData('tue')">Tue ↕</th>
+                                    <th class="p-3.5 text-center cursor-pointer hover:text-uganda-yellow" onclick="sortData('wed')">Wed ↕</th>
+                                    <th class="p-3.5 text-center cursor-pointer hover:text-uganda-yellow" onclick="sortData('thr')">Thr ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('code')">Code Number ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Intended Date ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timestamp')">Registered Date ↕</th>
@@ -254,7 +256,9 @@
                                     <th class="p-3.5">Grade</th>
                                     <th class="p-3.5">Class</th>
                                     <th class="p-3.5">Number</th>
-                                    <th class="p-3.5">Day</th>
+                                    <th class="p-3.5 text-center">Tue</th>
+                                    <th class="p-3.5 text-center">Wed</th>
+                                    <th class="p-3.5 text-center">Thr</th>
                                     <th class="p-3.5">Code Number</th>
                                     <th class="p-3.5">Intended Date</th>
                                     <th class="p-3.5">Registered Date</th>
@@ -360,6 +364,9 @@
                 class: c, 
                 classNo: n, 
                 days: daysStr,
+                tue: daysStr.includes("Tuesday") ? "✓" : "✗",
+                wed: daysStr.includes("Wednesday") ? "✓" : "✗",
+                thr: daysStr.includes("Thursday") ? "✓" : "✗",
                 code: code, 
                 timeSlot: t, 
                 timestamp: new Date().toLocaleString(),
@@ -389,7 +396,14 @@
             window[cb] = function(res) {
                 delete window[cb];
                 if(script.parentNode) script.parentNode.removeChild(script);
-                if(Array.isArray(res)) { 
+                if(Array.isArray(res)) {
+                    // Ensure legacy objects also get split tue/wed/thr values properly if fetched from sheet
+                    res.forEach(item => {
+                        let dStr = item.days || item.day || "";
+                        if (!item.tue) item.tue = dStr.includes("Tuesday") ? "✓" : "✗";
+                        if (!item.wed) item.wed = dStr.includes("Wednesday") ? "✓" : "✗";
+                        if (!item.thr) item.thr = dStr.includes("Thursday") ? "✓" : "✗";
+                    });
                     saveEntries(res); 
                     if(!document.getElementById('adminModal').classList.contains('hidden')) {
                         renderTable();
@@ -405,7 +419,7 @@
             document.getElementById('resGrade').textContent = e.grade;
             document.getElementById('resClass').textContent = e.class;
             document.getElementById('resClassNo').textContent = e.classNo;
-            document.getElementById('resDays').textContent = e.days || e.day || e.selectedDays || '--';
+            document.getElementById('resDays').textContent = e.days || '--';
             document.getElementById('resTimeSlot').textContent = formatTimeSlot(e.timeSlot);
             document.getElementById('resCode').textContent = e.code;
             document.getElementById('formCard').classList.add('hidden');
@@ -498,19 +512,26 @@
             vTbody.innerHTML = ''; sTbody.innerHTML = '';
             let valid = 0, spam = 0;
 
-            entries.filter(i => `${i.grade} ${i.class} ${i.days || i.day || ''} ${i.code} ${i.timeSlot}`.toLowerCase().includes(q)).forEach((e) => {
+            entries.filter(i => `${i.grade} ${i.class} ${i.code} ${i.timeSlot}`.toLowerCase().includes(q)).forEach((e) => {
                 let tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-900 transition';
                 
-                let daysVal = e.days || e.day || e.selectedDays || '--';
                 let rowId = e.id || e.code;
+                let tueVal = e.tue || (e.days && e.days.includes("Tuesday") ? "✓" : "✗");
+                let wedVal = e.wed || (e.days && e.days.includes("Wednesday") ? "✓" : "✗");
+                let thrVal = e.thr || (e.days && e.days.includes("Thursday") ? "✓" : "✗");
 
-                // Columns matching Grade | Class | Number | Day | Code Number | Intended Date | Registered Date | Action
+                let tueClass = tueVal === "✓" ? "text-green-400 font-bold text-base" : "text-red-500 font-bold text-sm";
+                let wedClass = wedVal === "✓" ? "text-green-400 font-bold text-base" : "text-red-500 font-bold text-sm";
+                let thrClass = thrVal === "✓" ? "text-green-400 font-bold text-base" : "text-red-500 font-bold text-sm";
+
                 tr.innerHTML = `
                     <td class="p-3.5 font-bold text-uganda-yellow">${e.grade || '--'}</td>
                     <td class="p-3.5 text-white">${e.class || '--'}</td>
                     <td class="p-3.5 text-white">${e.classNo || '--'}</td>
-                    <td class="p-3.5 text-cyan-300 font-semibold">${daysVal}</td>
+                    <td class="p-3.5 text-center ${tueClass}">${tueVal}</td>
+                    <td class="p-3.5 text-center ${wedClass}">${wedVal}</td>
+                    <td class="p-3.5 text-center ${thrClass}">${thrVal}</td>
                     <td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code || '--'}</td>
                     <td class="p-3.5 text-uganda-yellow">${formatTimeSlot(e.timeSlot)}</td>
                     <td class="p-3.5 text-gray-400 text-[11px]">${e.timestamp || '--'}</td>
@@ -550,8 +571,13 @@
         function exportToCSV() {
             let entries = getEntries();
             if(!entries.length) return alert('No entries.');
-            let csv = "Grade,Class,Number,Day,Code Number,Intended Date,Registered Date\n" + 
-                entries.map(r => `"${r.grade}","${r.class}",${r.classNo},"${r.days || r.day || r.selectedDays || ''}","${r.code}","${formatTimeSlot(r.timeSlot) || ''}","${r.timestamp || ''}"`).join("\n");
+            let csv = "Grade,Class,Number,Tue,Wed,Thr,Code Number,Intended Date,Registered Date\n" + 
+                entries.map(r => {
+                    let t = r.tue || (r.days && r.days.includes("Tuesday") ? "✓" : "✗");
+                    let w = r.wed || (r.days && r.days.includes("Wednesday") ? "✓" : "✗");
+                    let th = r.thr || (r.days && r.days.includes("Thursday") ? "✓" : "✗");
+                    return `"${r.grade}","${r.class}",${r.classNo},"${t}","${w}","${th}","${r.code}","${formatTimeSlot(r.timeSlot) || ''}","${r.timestamp || ''}"`;
+                }).join("\n");
             let link = document.createElement("a");
             link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
             link.download = `Uganda_Week_Registrations_${Date.now()}.csv`;
