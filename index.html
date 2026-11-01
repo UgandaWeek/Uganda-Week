@@ -233,12 +233,12 @@
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('grade')">Grade ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('class')">Class ↕</th>
                                     <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('classNo')">Number ↕</th>
+                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('code')">Code Number ↕</th>
+                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Intended Date ↕</th>
+                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timestamp')">Register Date ↕</th>
                                     <th class="p-3.5 text-center cursor-pointer hover:text-uganda-yellow" onclick="sortData('tue')">Tue ↕</th>
                                     <th class="p-3.5 text-center cursor-pointer hover:text-uganda-yellow" onclick="sortData('wed')">Wed ↕</th>
                                     <th class="p-3.5 text-center cursor-pointer hover:text-uganda-yellow" onclick="sortData('thr')">Thr ↕</th>
-                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('code')">Code Number ↕</th>
-                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timeSlot')">Intended Date ↕</th>
-                                    <th class="p-3.5 cursor-pointer hover:text-uganda-yellow" onclick="sortData('timestamp')">Registered Date ↕</th>
                                     <th class="p-3.5">Action</th>
                                 </tr>
                             </thead>
@@ -256,12 +256,12 @@
                                     <th class="p-3.5">Grade</th>
                                     <th class="p-3.5">Class</th>
                                     <th class="p-3.5">Number</th>
+                                    <th class="p-3.5">Code Number</th>
+                                    <th class="p-3.5">Intended Date</th>
+                                    <th class="p-3.5">Register Date</th>
                                     <th class="p-3.5 text-center">Tue</th>
                                     <th class="p-3.5 text-center">Wed</th>
                                     <th class="p-3.5 text-center">Thr</th>
-                                    <th class="p-3.5">Code Number</th>
-                                    <th class="p-3.5">Intended Date</th>
-                                    <th class="p-3.5">Registered Date</th>
                                     <th class="p-3.5">Action</th>
                                 </tr>
                             </thead>
@@ -397,7 +397,6 @@
                 delete window[cb];
                 if(script.parentNode) script.parentNode.removeChild(script);
                 if(Array.isArray(res)) {
-                    // Ensure legacy objects also get split tue/wed/thr values properly if fetched from sheet
                     res.forEach(item => {
                         let dStr = item.days || item.day || "";
                         if (!item.tue) item.tue = dStr.includes("Tuesday") ? "✓" : "✗";
@@ -517,24 +516,25 @@
                 tr.className = 'hover:bg-gray-900 transition';
                 
                 let rowId = e.id || e.code;
-                let tueVal = e.tue || (e.days && e.days.includes("Tuesday") ? "✓" : "✗");
-                let wedVal = e.wed || (e.days && e.days.includes("Wednesday") ? "✓" : "✗");
-                let thrVal = e.thr || (e.days && e.days.includes("Thursday") ? "✓" : "✗");
+                let tueVal = e.tue || "✗";
+                let wedVal = e.wed || "✗";
+                let thrVal = e.thr || "✗";
 
                 let tueClass = tueVal === "✓" ? "text-green-400 font-bold text-base" : "text-red-500 font-bold text-sm";
                 let wedClass = wedVal === "✓" ? "text-green-400 font-bold text-base" : "text-red-500 font-bold text-sm";
                 let thrClass = thrVal === "✓" ? "text-green-400 font-bold text-base" : "text-red-500 font-bold text-sm";
 
+                // Order: Grade | Class | Number | Code Number | Intended Date | Register Date | Tue | Wed | Thr | Action
                 tr.innerHTML = `
                     <td class="p-3.5 font-bold text-uganda-yellow">${e.grade || '--'}</td>
                     <td class="p-3.5 text-white">${e.class || '--'}</td>
                     <td class="p-3.5 text-white">${e.classNo || '--'}</td>
-                    <td class="p-3.5 text-center ${tueClass}">${tueVal}</td>
-                    <td class="p-3.5 text-center ${wedClass}">${wedVal}</td>
-                    <td class="p-3.5 text-center ${thrClass}">${thrVal}</td>
                     <td class="p-3.5 font-mono text-uganda-yellow font-bold">${e.code || '--'}</td>
                     <td class="p-3.5 text-uganda-yellow">${formatTimeSlot(e.timeSlot)}</td>
                     <td class="p-3.5 text-gray-400 text-[11px]">${e.timestamp || '--'}</td>
+                    <td class="p-3.5 text-center ${tueClass}">${tueVal}</td>
+                    <td class="p-3.5 text-center ${wedClass}">${wedVal}</td>
+                    <td class="p-3.5 text-center ${thrClass}">${thrVal}</td>
                     <td class="p-3.5"><button onclick="deleteEntry('${rowId}')" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>
                 `;
                 
@@ -571,12 +571,12 @@
         function exportToCSV() {
             let entries = getEntries();
             if(!entries.length) return alert('No entries.');
-            let csv = "Grade,Class,Number,Tue,Wed,Thr,Code Number,Intended Date,Registered Date\n" + 
+            let csv = "Grade,Class,Number,Code Number,Intended Date,Register Date,Tue,Wed,Thr\n" + 
                 entries.map(r => {
-                    let t = r.tue || (r.days && r.days.includes("Tuesday") ? "✓" : "✗");
-                    let w = r.wed || (r.days && r.days.includes("Wednesday") ? "✓" : "✗");
-                    let th = r.thr || (r.days && r.days.includes("Thursday") ? "✓" : "✗");
-                    return `"${r.grade}","${r.class}",${r.classNo},"${t}","${w}","${th}","${r.code}","${formatTimeSlot(r.timeSlot) || ''}","${r.timestamp || ''}"`;
+                    let t = r.tue || "✗";
+                    let w = r.wed || "✗";
+                    let th = r.thr || "✗";
+                    return `"${r.grade}","${r.class}",${r.classNo},"${r.code}","${formatTimeSlot(r.timeSlot) || ''}","${r.timestamp || ''}","${t}","${w}","${th}"`;
                 }).join("\n");
             let link = document.createElement("a");
             link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
