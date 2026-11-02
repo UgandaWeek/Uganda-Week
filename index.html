@@ -70,7 +70,7 @@
                         <label for="gradeSelect" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                             <i data-lucide="graduation-cap" class="w-4 h-4 text-uganda-yellow"></i> Select Grade
                         </label>
-                        <select id="gradeSelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3 transition-all outline-none appearance-none cursor-pointer">
+                        <select id="gradeSelect" required onchange="handleGradeChange()" class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3 transition-all outline-none appearance-none cursor-pointer">
                             <option value="" disabled selected>-- Choose Grade --</option>
                             <optgroup label="Kindergarten">
                                 <option value="K1">K1</option><option value="K2">K2</option><option value="K3">K3</option>
@@ -90,8 +90,12 @@
                         </label>
                         <select id="classSelect" required class="w-full bg-black/70 border border-gray-700 text-white text-sm rounded-xl focus:ring-2 focus:ring-uganda-yellow focus:border-uganda-yellow p-3 transition-all outline-none cursor-pointer">
                             <option value="" disabled selected>-- Choose Class --</option>
-                            <option value="A">Class A</option><option value="B">Class B</option><option value="C">Class C</option>
-                            <option value="D">Class D</option><option value="E">Class E</option><option value="F">Class F</option>
+                            <option value="A">Class A</option>
+                            <option value="B">Class B</option>
+                            <option value="C">Class C</option>
+                            <option value="D">Class D</option>
+                            <option id="optClassE" value="E">Class E</option>
+                            <option id="optClassF" value="F">Class F</option>
                         </select>
                     </div>
 
@@ -204,14 +208,11 @@
                 </div>
 
                 <div class="flex items-center justify-between text-xs text-gray-400 px-1">
-                    <span>Total: <strong id="totalCount" class="text-uganda-yellow font-mono">0</strong></span>
-                    <span>Valid: <strong id="validCount" class="text-green-400 font-mono">0</strong></span>
-                    <span>Flagged: <strong id="spamCount" class="text-red-400 font-mono">0</strong></span>
+                    <span>Total Registrations: <strong id="totalCount" class="text-uganda-yellow font-mono">0</strong></span>
                 </div>
 
                 <div>
-                    <div class="text-sm font-bold text-green-300 mb-2 flex items-center gap-2"><i data-lucide="check-square" class="w-4 h-4"></i> Valid Records (Click headers to sort)</div>
-                    <div class="max-h-[28vh] overflow-auto border border-gray-800 rounded-2xl bg-black">
+                    <div class="max-h-[55vh] overflow-auto border border-gray-800 rounded-2xl bg-black">
                         <table class="w-full text-left text-xs text-gray-300">
                             <thead class="bg-black text-gray-400 uppercase sticky top-0 border-b border-gray-800 font-mono select-none">
                                 <tr>
@@ -230,28 +231,6 @@
                         </table>
                     </div>
                 </div>
-
-                <div>
-                    <div class="text-sm font-bold text-red-300 mb-2 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Flagged Box</div>
-                    <div class="max-h-[28vh] overflow-auto border border-red-900/40 rounded-2xl bg-black">
-                        <table class="w-full text-left text-xs text-gray-300">
-                            <thead class="bg-black text-gray-400 uppercase sticky top-0 border-b border-red-900/40 font-mono">
-                                <tr>
-                                    <th class="p-3.5">Grade</th>
-                                    <th class="p-3.5">Class</th>
-                                    <th class="p-3.5">Number</th>
-                                    <th class="p-3.5">Code Number</th>
-                                    <th class="p-3.5">Intended Date</th>
-                                    <th class="p-3.5">Register Date</th>
-                                    <th class="p-3.5 text-center">Tue</th>
-                                    <th class="p-3.5 text-center">Wed</th>
-                                    <th class="p-3.5 text-center">Thr</th>
-                                </tr>
-                            </thead>
-                            <tbody id="spamTableBody" class="divide-y divide-red-950 font-mono"></tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -265,17 +244,10 @@
     <script>
         const ADMIN_PASS = "20UgandaGbCrBd26";
         const KEY_ENTRIES = 'uganda_week_entries';
-        const KEY_DEVICE = 'uganda_week_device';
         const WEBHOOK = "https://script.google.com/macros/s/AKfycbzB8TGKugWcVtRuxDiLC7hbaWKBHAfEgPQHqQzJY7I8zF8fD6WwAe9wHnO2ikUvsLpO/exec";
         
         let clickCount = 0, clickTimer = null;
         let sortField = 'id', sortAsc = true;
-
-        let deviceId = localStorage.getItem(KEY_DEVICE) || (() => {
-            let id = 'DEV-' + Math.random().toString(36).substring(2, 9).toUpperCase();
-            localStorage.setItem(KEY_DEVICE, id);
-            return id;
-        })();
 
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
@@ -287,6 +259,30 @@
                 document.getElementById(id).addEventListener('change', () => document.getElementById('duplicateWarning').classList.add('hidden'));
             });
         });
+
+        function handleGradeChange() {
+            let grade = document.getElementById('gradeSelect').value;
+            let classSelect = document.getElementById('classSelect');
+            let optE = document.getElementById('optClassE');
+            let optF = document.getElementById('optClassF');
+
+            if (grade.startsWith('K')) {
+                if (classSelect.value === 'E' || classSelect.value === 'F') {
+                    classSelect.value = "";
+                }
+                optE.style.display = 'none';
+                optF.style.display = 'none';
+            } else if (grade.startsWith('P')) {
+                if (classSelect.value === 'F') {
+                    classSelect.value = "";
+                }
+                optE.style.display = 'block';
+                optF.style.display = 'none';
+            } else if (grade.startsWith('S')) {
+                optE.style.display = 'block';
+                optF.style.display = 'block';
+            }
+        }
 
         function populateClassNos() {
             let sel = document.getElementById('classNoSelect');
@@ -352,9 +348,7 @@
                 thr: daysStr.includes("Thursday") ? "Y" : "N",
                 code: code, 
                 timeSlot: t, 
-                timestamp: new Date().toLocaleString(),
-                deviceId: deviceId, 
-                isPermanentSpam: entries.filter(x => x.deviceId === deviceId).length >= 8 
+                timestamp: new Date().toLocaleString()
             };
 
             entries.push(entry);
@@ -381,7 +375,7 @@
                 if(script.parentNode) script.parentNode.removeChild(script);
                 if(Array.isArray(res)) {
                     res.forEach(item => {
-                        let dStr = item.days || item.day || "";
+                        let dStr = item.days || "";
                         if (!item.tue) item.tue = dStr.includes("Tuesday") ? "Y" : "N";
                         if (!item.wed) item.wed = dStr.includes("Wednesday") ? "Y" : "N";
                         if (!item.thr) item.thr = dStr.includes("Thursday") ? "Y" : "N";
@@ -415,6 +409,7 @@
             document.querySelectorAll('input[name="daysCheckbox"]').forEach(cb => cb.checked = false);
             document.getElementById('duplicateWarning').classList.add('hidden');
             document.getElementById('dayError').classList.add('hidden');
+            handleGradeChange();
         }
 
         function setupTrigger() {
@@ -478,7 +473,7 @@
         }
 
         function renderTable() {
-            let vTbody = document.getElementById('validTableBody'), sTbody = document.getElementById('spamTableBody');
+            let tbody = document.getElementById('validTableBody');
             let q = document.getElementById('searchInput').value.toLowerCase();
             let entries = getEntries();
 
@@ -491,8 +486,7 @@
                 return 0;
             });
 
-            vTbody.innerHTML = ''; sTbody.innerHTML = '';
-            let valid = 0, spam = 0;
+            tbody.innerHTML = '';
 
             entries.filter(i => `${i.grade} ${i.class} ${i.code} ${i.timeSlot}`.toLowerCase().includes(q)).forEach((e) => {
                 let tr = document.createElement('tr');
@@ -506,7 +500,6 @@
                 let wedClass = wedVal === "Y" ? "text-green-400 font-extrabold text-base" : "text-red-500 font-extrabold text-base";
                 let thrClass = thrVal === "Y" ? "text-green-400 font-extrabold text-base" : "text-red-500 font-extrabold text-base";
 
-                // Order: Grade | Class | Number | Code Number | Intended Date | Register Date | Tue | Wed | Thr (Action column removed)
                 tr.innerHTML = `
                     <td class="p-3.5 font-bold text-uganda-yellow">${e.grade || '--'}</td>
                     <td class="p-3.5 text-white">${e.class || '--'}</td>
@@ -519,18 +512,10 @@
                     <td class="p-3.5 text-center ${thrClass}">${thrVal}</td>
                 `;
                 
-                if(e.isPermanentSpam) { 
-                    sTbody.appendChild(tr); 
-                    spam++; 
-                } else { 
-                    vTbody.appendChild(tr); 
-                    valid++; 
-                }
+                tbody.appendChild(tr);
             });
 
             document.getElementById('totalCount').textContent = entries.length;
-            document.getElementById('validCount').textContent = valid;
-            document.getElementById('spamCount').textContent = spam;
         }
     </script>
 </body>
