@@ -177,7 +177,7 @@
             <div class="p-5 border-b border-gray-800 flex items-center justify-between bg-black flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="p-2 rounded-xl bg-uganda-yellow/10 border border-uganda-yellow/30 text-uganda-yellow"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i></div>
-                    <div><h3 class="text-lg font-bold text-white">Master Database</h3><p class="text-xs text-gray-400">Cross-device sync, sorting & export</p></div>
+                    <div><h3 class="text-lg font-bold text-white">Master Database</h3><p class="text-xs text-gray-400">Cross-device view & sorting</p></div>
                 </div>
                 <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white p-2 rounded-xl hover:bg-gray-900 transition"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
@@ -201,21 +201,6 @@
                         <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-3.5"></i>
                         <input type="text" id="searchInput" oninput="renderTable()" placeholder="Search..." class="w-full bg-black border border-gray-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white outline-none focus:border-uganda-yellow">
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="fetchRemoteEntries()" class="bg-blue-700 hover:bg-blue-600 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center gap-1.5"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync</button>
-                        <button onclick="exportToCSV()" class="bg-green-700 hover:bg-green-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> CSV</button>
-                        <button onclick="showClearLogVerification()" class="bg-black hover:bg-red-950 text-red-400 border border-red-900/60 font-semibold py-2.5 px-3 rounded-xl text-xs transition flex items-center gap-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i> Clear</button>
-                    </div>
-                </div>
-
-                <div id="clearVerifyPanel" class="hidden bg-black p-4 rounded-2xl border border-red-900 space-y-3">
-                    <p class="text-sm text-red-300 font-semibold">⚠️ Delete ALL local records? Enter password.</p>
-                    <div class="flex gap-2 items-center">
-                        <input type="password" id="clearPassInput" placeholder="Password" class="flex-1 bg-black border border-red-900 rounded-xl px-3 py-2 text-sm text-white outline-none">
-                        <button onclick="confirmClearLog()" class="bg-red-700 hover:bg-red-600 text-white font-bold px-3 py-2 rounded-xl text-xs">Confirm</button>
-                        <button onclick="hideClearLogVerification()" class="bg-black border border-gray-800 text-gray-300 px-3 py-2 rounded-xl text-xs">Cancel</button>
-                    </div>
-                    <p id="clearPassError2" class="hidden text-xs text-red-400">Wrong password.</p>
                 </div>
 
                 <div class="flex items-center justify-between text-xs text-gray-400 px-1">
@@ -239,7 +224,6 @@
                                     <th class="p-3.5 text-center cursor-pointer hover:text-uganda-yellow" onclick="sortData('tue')">Tue ↕</th>
                                     <th class="p-3.5 text-center cursor-pointer hover:text-uganda-yellow" onclick="sortData('wed')">Wed ↕</th>
                                     <th class="p-3.5 text-center cursor-pointer hover:text-uganda-yellow" onclick="sortData('thr')">Thr ↕</th>
-                                    <th class="p-3.5">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="validTableBody" class="divide-y divide-gray-900 font-mono"></tbody>
@@ -262,7 +246,6 @@
                                     <th class="p-3.5 text-center">Tue</th>
                                     <th class="p-3.5 text-center">Wed</th>
                                     <th class="p-3.5 text-center">Thr</th>
-                                    <th class="p-3.5">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="spamTableBody" class="divide-y divide-red-950 font-mono"></tbody>
@@ -515,9 +498,6 @@
                 let tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-900 transition';
                 
-                let rowId = e.id || e.code;
-                
-                // Format Y / N with Green Y and Red N
                 let tueVal = (e.tue === "Y" || e.tue === "✓") ? "Y" : "N";
                 let wedVal = (e.wed === "Y" || e.wed === "✓") ? "Y" : "N";
                 let thrVal = (e.thr === "Y" || e.thr === "✓") ? "Y" : "N";
@@ -526,7 +506,7 @@
                 let wedClass = wedVal === "Y" ? "text-green-400 font-extrabold text-base" : "text-red-500 font-extrabold text-base";
                 let thrClass = thrVal === "Y" ? "text-green-400 font-extrabold text-base" : "text-red-500 font-extrabold text-base";
 
-                // Order: Grade | Class | Number | Code Number | Intended Date | Register Date | Tue | Wed | Thr | Action
+                // Order: Grade | Class | Number | Code Number | Intended Date | Register Date | Tue | Wed | Thr (Action column removed)
                 tr.innerHTML = `
                     <td class="p-3.5 font-bold text-uganda-yellow">${e.grade || '--'}</td>
                     <td class="p-3.5 text-white">${e.class || '--'}</td>
@@ -537,7 +517,6 @@
                     <td class="p-3.5 text-center ${tueClass}">${tueVal}</td>
                     <td class="p-3.5 text-center ${wedClass}">${wedVal}</td>
                     <td class="p-3.5 text-center ${thrClass}">${thrVal}</td>
-                    <td class="p-3.5"><button onclick="deleteEntry('${rowId}')" class="px-2 py-1 rounded bg-black border border-red-900 text-red-400 hover:bg-red-950 text-[10px]">Delete</button></td>
                 `;
                 
                 if(e.isPermanentSpam) { 
@@ -552,50 +531,6 @@
             document.getElementById('totalCount').textContent = entries.length;
             document.getElementById('validCount').textContent = valid;
             document.getElementById('spamCount').textContent = spam;
-        }
-
-        function deleteEntry(id) {
-            let entries = getEntries();
-            let updated = entries.filter(i => String(i.id !== undefined ? i.id : i.code) !== String(id));
-            saveEntries(updated);
-            renderTable();
-
-            if(WEBHOOK) {
-                fetch(WEBHOOK, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                    body: JSON.stringify({ action: 'deleteRecord', id: id })
-                }).catch(()=>{});
-            }
-        }
-
-        function exportToCSV() {
-            let entries = getEntries();
-            if(!entries.length) return alert('No entries.');
-            let csv = "Grade,Class,Number,Code Number,Intended Date,Register Date,Tue,Wed,Thr\n" + 
-                entries.map(r => {
-                    let t = (r.tue === "Y" || r.tue === "✓") ? "Y" : "N";
-                    let w = (r.wed === "Y" || r.wed === "✓") ? "Y" : "N";
-                    let th = (r.thr === "Y" || r.thr === "✓") ? "Y" : "N";
-                    return `"${r.grade}","${r.class}",${r.classNo},"${r.code}","${formatTimeSlot(r.timeSlot) || ''}","${r.timestamp || ''}","${t}","${w}","${th}"`;
-                }).join("\n");
-            let link = document.createElement("a");
-            link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-            link.download = `Uganda_Week_Registrations_${Date.now()}.csv`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
-
-        function showClearLogVerification() { document.getElementById('clearVerifyPanel').classList.remove('hidden'); }
-        function hideClearLogVerification() { document.getElementById('clearVerifyPanel').classList.add('hidden'); }
-        function confirmClearLog() {
-            if(document.getElementById('clearPassInput').value === ADMIN_PASS) {
-                localStorage.removeItem(KEY_ENTRIES);
-                renderTable();
-                hideClearLogVerification();
-            } else {
-                document.getElementById('clearPassError2').classList.remove('hidden');
-            }
         }
     </script>
 </body>
