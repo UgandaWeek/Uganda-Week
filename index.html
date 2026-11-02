@@ -364,9 +364,9 @@
                 class: c, 
                 classNo: n, 
                 days: daysStr,
-                tue: daysStr.includes("Tuesday") ? "✓" : "✗",
-                wed: daysStr.includes("Wednesday") ? "✓" : "✗",
-                thr: daysStr.includes("Thursday") ? "✓" : "✗",
+                tue: daysStr.includes("Tuesday") ? "Y" : "N",
+                wed: daysStr.includes("Wednesday") ? "Y" : "N",
+                thr: daysStr.includes("Thursday") ? "Y" : "N",
                 code: code, 
                 timeSlot: t, 
                 timestamp: new Date().toLocaleString(),
@@ -399,9 +399,9 @@
                 if(Array.isArray(res)) {
                     res.forEach(item => {
                         let dStr = item.days || item.day || "";
-                        if (!item.tue) item.tue = dStr.includes("Tuesday") ? "✓" : "✗";
-                        if (!item.wed) item.wed = dStr.includes("Wednesday") ? "✓" : "✗";
-                        if (!item.thr) item.thr = dStr.includes("Thursday") ? "✓" : "✗";
+                        if (!item.tue) item.tue = dStr.includes("Tuesday") ? "Y" : "N";
+                        if (!item.wed) item.wed = dStr.includes("Wednesday") ? "Y" : "N";
+                        if (!item.thr) item.thr = dStr.includes("Thursday") ? "Y" : "N";
                     });
                     saveEntries(res); 
                     if(!document.getElementById('adminModal').classList.contains('hidden')) {
@@ -516,13 +516,15 @@
                 tr.className = 'hover:bg-gray-900 transition';
                 
                 let rowId = e.id || e.code;
-                let tueVal = e.tue || "✗";
-                let wedVal = e.wed || "✗";
-                let thrVal = e.thr || "✗";
+                
+                // Format Y / N with Green Y and Red N
+                let tueVal = (e.tue === "Y" || e.tue === "✓") ? "Y" : "N";
+                let wedVal = (e.wed === "Y" || e.wed === "✓") ? "Y" : "N";
+                let thrVal = (e.thr === "Y" || e.thr === "✓") ? "Y" : "N";
 
-                let tueClass = tueVal === "✓" ? "text-green-400 font-bold text-base" : "text-red-500 font-bold text-sm";
-                let wedClass = wedVal === "✓" ? "text-green-400 font-bold text-base" : "text-red-500 font-bold text-sm";
-                let thrClass = thrVal === "✓" ? "text-green-400 font-bold text-base" : "text-red-500 font-bold text-sm";
+                let tueClass = tueVal === "Y" ? "text-green-400 font-extrabold text-base" : "text-red-500 font-extrabold text-base";
+                let wedClass = wedVal === "Y" ? "text-green-400 font-extrabold text-base" : "text-red-500 font-extrabold text-base";
+                let thrClass = thrVal === "Y" ? "text-green-400 font-extrabold text-base" : "text-red-500 font-extrabold text-base";
 
                 // Order: Grade | Class | Number | Code Number | Intended Date | Register Date | Tue | Wed | Thr | Action
                 tr.innerHTML = `
@@ -573,9 +575,9 @@
             if(!entries.length) return alert('No entries.');
             let csv = "Grade,Class,Number,Code Number,Intended Date,Register Date,Tue,Wed,Thr\n" + 
                 entries.map(r => {
-                    let t = r.tue || "✗";
-                    let w = r.wed || "✗";
-                    let th = r.thr || "✗";
+                    let t = (r.tue === "Y" || r.tue === "✓") ? "Y" : "N";
+                    let w = (r.wed === "Y" || r.wed === "✓") ? "Y" : "N";
+                    let th = (r.thr === "Y" || r.thr === "✓") ? "Y" : "N";
                     return `"${r.grade}","${r.class}",${r.classNo},"${r.code}","${formatTimeSlot(r.timeSlot) || ''}","${r.timestamp || ''}","${t}","${w}","${th}"`;
                 }).join("\n");
             let link = document.createElement("a");
